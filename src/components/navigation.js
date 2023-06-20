@@ -15,17 +15,23 @@ const Navigation = () => {
 
   return (
     <Fragment>
-      <div className="bg-gray-900 py-[16px] px-[24px] text-white flex items-center justify-end">
-        <Link className="logo-container" href="/"></Link>
-        <div className="flex gap-x-[30px]">
+      <div className="bg-gray-900 py-[12px] px-[24px] text-white flex items-center justify-end fixed top-0 w-full">
+        <div className="flex items-center gap-x-[30px]">
           <Link className="nav-link text-white" href="/">
             HOME
           </Link>
-
+          <Link className="nav-link text-white" href="/rental-store">
+            PRODUCTS
+          </Link>
+          <Link className="nav-link text-white" href="/rental-store">
+            USERS
+          </Link>
+          <Link className="nav-link text-white" href="/rental-store">
+            RENT
+          </Link>
           {currentUser ? (
             <span className="nav-link" onClick={signOutHandler}>
-              {" "}
-              SIGN OUT{" "}
+              SIGN OUT
             </span>
           ) : (
             <Link className="nav-link text-white" href="/auth">
