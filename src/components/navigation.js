@@ -15,26 +15,26 @@ const Navigation = () => {
 
   return (
     <Fragment>
-      <div className="bg-gray-900 py-[12px] px-[24px] text-white flex items-center justify-end fixed top-0 w-full">
+      <div className="bg-gray-900 py-[12px] px-[24px] text-white flex items-center justify-end fixed top-0 w-full z-[1]">
         <div className="flex items-center gap-x-[30px]">
           <Link className="nav-link text-white" href="/">
             HOME
           </Link>
-          <Link className="nav-link text-white" href="/rental-store">
+          <Link className="nav-link text-white" href="/products">
             PRODUCTS
           </Link>
-          <Link className="nav-link text-white" href="/rental-store">
-            USERS
+          <Link className="nav-link text-white" href="/customers">
+            CUSTOMERS
           </Link>
-          <Link className="nav-link text-white" href="/rental-store">
-            RENT
+          <Link className="nav-link text-white" href="/orders">
+            ORDERS
           </Link>
           {currentUser ? (
             <span className="nav-link" onClick={signOutHandler}>
               SIGN OUT
             </span>
           ) : (
-            <Link className="nav-link text-white" href="/auth">
+            <Link className="nav-link text-white" href="/sign-in">
               SIGN IN
             </Link>
           )}

@@ -40,7 +40,7 @@ const Home = () => {
         <div className="m-[24px] grid justify-items-center">
           <div className="p-[16px] border border-[#aaa] grid bg-[#fff] drop-shadow-2xl">
             <h2 className="text-[36px] text-center mb-[12px]">
-              Alredy have an account?{" "}
+              Sign In?{" "}
             </h2>
             <h3 className="text-[24px] text-[#aaa] font-light text-center mb-[24px]">
               Sign In with your email and password
@@ -90,7 +90,7 @@ const Home = () => {
                     className="text-[12px] text-red-500"
                   />
                 </div>
-                <div className="mt-[24px] grid grid-cols-2 gap-[30px] justify-between">
+                <div className="mt-[24px] grid">
                   <button
                     type="submit"
                     className="bg-green-200 py-[12px] px-[12px]"
@@ -98,7 +98,7 @@ const Home = () => {
                     Sign In
                   </button>
 
-                  <button
+                  {/* <button
                     type="button"
                     className="bg-white border border-[#aaa] py-[12px] px-[12px] flex items-center gap-x-[8px] justify-center"
                     onClick={logGoogleUser}
@@ -109,17 +109,17 @@ const Home = () => {
                       className="w-[24px] h-[24px]"
                     />
                     Google User
-                  </button>
+                  </button> */}
                 </div>
               </Form>
             </Formik>{" "}
           </div>
-          <p className="mt-[16px]">
+          {/* <p className="mt-[16px]">
             Don't have an account?{" "}
             <Link href="/sign-up" className="text-purple-600">
               Sign Up
             </Link>
-          </p>
+          </p> */}
         </div>
       </div>
     </>
