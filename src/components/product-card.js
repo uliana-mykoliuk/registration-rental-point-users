@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const ProductCard = ({ id, title, image }) => {
+const ProductCard = ({ id, title, image, handleEditCategory }) => {
   return (
     <div className="bg-white shadow-2xl border border-[#aaa]">
       <div className="relative">
@@ -9,13 +9,21 @@ const ProductCard = ({ id, title, image }) => {
           {title}
         </h3>
       </div>
-      <Link
-        href={"/categories/" + id}
-        type="button"
-        className="bg-purple-300 py-[12px] px-[12px] w-full text-center"
-      >
-        GO TO PRODUCTS
-      </Link>
+      <div className="grid grid-cols-2">
+        <button
+          onClick={handleEditCategory}
+          type="button"
+          className="bg-green-300 py-[12px] px-[12px] w-full text-center"
+        >
+          EDIT
+        </button>
+        <Link
+          href={"/categories/" + id}
+          className="bg-purple-300 py-[12px] px-[12px] w-full text-center"
+        >
+          GO TO PRODUCTS
+        </Link>
+      </div>
     </div>
   );
 };

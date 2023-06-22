@@ -176,11 +176,32 @@ const ProductsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState();
   const [updateData, setUpdateData] = useState(true);
   const [products, setProducts] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState(null);
+
+  useEffect(() => {
+    if (products) {
+      if (searchValue) {
+        setFilteredProducts(
+          products
+            .filter((products) =>
+              products.title.toLowerCase().includes(searchValue.toLowerCase())
+            )
+            .sort((a, b) => b?.createDate?.seconds - a?.createDate?.seconds)
+        );
+      } else {
+        setFilteredProducts(
+          products.sort(
+            (a, b) => b?.createDate?.seconds - a?.createDate?.seconds
+          )
+        );
+      }
+    }
+  }, [searchValue, products]);
 
   const fetchData = async () => {
     const productsArray = await getProductsByCategory(categoryId);
     setProducts(productsArray);
-    console.log(productsArray);
     setUpdateData(false);
   };
 
@@ -193,7 +214,7 @@ const ProductsPage = () => {
   }, [updateData, categoryId]);
 
   const onAddProduct = async (values) => {
-    const res = await addProductToCategory(categoryId, values);
+    await addProductToCategory(categoryId, values);
     setUpdateData(true);
     setIsModalOpen(false);
   };
@@ -220,27 +241,39 @@ const ProductsPage = () => {
   };
 
   return (
-    <Layout>
+    <Layout title="Products">
       <AddProductModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         submitFunc={onAddProduct}
       />
-      <button
-        type="button"
-        onClick={() => setIsModalOpen(true)}
-        className="bg-purple-500 py-[8px] px-[12px] self-end mb-[50px]"
-      >
-        Add Product
-      </button>
+      <div className="flex items-center justify-between mb-[50px]">
+        <input
+          name="search"
+          placeholder="Search custommer"
+          onChange={(event) => {
+            setSearchValue(event.target.value);
+          }}
+          className="border border-[#aaa] px-[16px] py-[8px]"
+        />
+        <button
+          type="button"
+          onClick={() => setIsModalOpen(true)}
+          className="bg-purple-500 py-[8px] px-[12px] self-end"
+        >
+          Add Product
+        </button>
+      </div>
 
-      <ProductTable
-        products={products}
-        itemsPerPage={itemsPerPage}
-        handleEditProduct={handleEditProduct}
-        handleDeleteProduct={handleDeleteProduct}
-        handleRentProduct={handleRentProduct}
-      />
+      {filteredProducts && (
+        <ProductTable
+          products={filteredProducts}
+          itemsPerPage={itemsPerPage}
+          handleEditProduct={handleEditProduct}
+          handleDeleteProduct={handleDeleteProduct}
+          handleRentProduct={handleRentProduct}
+        />
+      )}
     </Layout>
   );
 };

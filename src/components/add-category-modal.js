@@ -1,6 +1,6 @@
 import { ErrorMessage, Form, Formik } from "formik";
 import CustomModal from "./custom-modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "./input";
 import * as Yup from "yup";
 
@@ -10,13 +10,24 @@ const validationSchema = Yup.object().shape({
   // Add more fields and validation rules as needed
 });
 
-const AddCategoryModal = ({ isOpen, onClose, submitFunc }) => {
-  const [previewImage, setPreviewImage] = useState("");
+const AddCategoryModal = ({ isOpen, onClose, submitFunc, category }) => {
+  const [previewImage, setPreviewImage] = useState(
+    category?.image ? category?.image : ""
+  );
+
+  useEffect(() => {
+    if (category?.image) {
+      setPreviewImage(category?.image);
+    }
+  }, [category]);
 
   return (
     <CustomModal title="Add Category" isOpen={isOpen} onClose={onClose}>
       <Formik
-        initialValues={{ title: "", image: "" }}
+        initialValues={{
+          title: category?.title || "",
+          image: category?.image || "",
+        }}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {
           console.log("submit item", values);

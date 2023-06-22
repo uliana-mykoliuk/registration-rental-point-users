@@ -9,10 +9,12 @@ import {
   signInAuthUserWithEmailAndPassword,
   signInWithGooglePopup,
 } from "../utils/firebase/firebase";
+import { useRouter } from "next/router";
 
 import GoogleIcon from "../assets/google-logo.png";
 
 const Home = () => {
+  const router = useRouter();
   const logGoogleUser = async () => {
     await signInWithGooglePopup();
   };
@@ -20,6 +22,7 @@ const Home = () => {
   const handleLogin = async ({ email, password }) => {
     try {
       await signInAuthUserWithEmailAndPassword(email, password);
+      router.push("/products");
     } catch (error) {
       switch (error.code) {
         case "auth/wrong-password":
@@ -39,9 +42,7 @@ const Home = () => {
       <div className="flex justify-center items-center min-h-screen">
         <div className="m-[24px] grid justify-items-center">
           <div className="p-[16px] border border-[#aaa] grid bg-[#fff] drop-shadow-2xl">
-            <h2 className="text-[36px] text-center mb-[12px]">
-              Sign In?{" "}
-            </h2>
+            <h2 className="text-[36px] text-center mb-[12px]">Sign In </h2>
             <h3 className="text-[24px] text-[#aaa] font-light text-center mb-[24px]">
               Sign In with your email and password
             </h3>

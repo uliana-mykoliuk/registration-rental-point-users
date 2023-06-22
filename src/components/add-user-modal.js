@@ -23,27 +23,31 @@ const AddUserModal = ({ isOpen, onClose, submitFunc, user }) => {
           name: user?.name ? user?.name : "",
           email: user?.email ? user?.email : "",
           phone: user?.phone ? user?.phone : "",
-          products: user?.products,
+          products: user?.products || [],
         }}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {
+          console.log("userSabmited");
           submitFunc(values);
           setSubmitting(false);
         }}
       >
-        {({ setFieldValue }) => (
-          <Form className="grid gap-y-[12px] mt-[20px]">
-            <Input label="Name" name="name" />
-            <Input label="Email" name="email" type="email" />
-            <Input label="Phone" name="phone" type="phone" />
-            <button
-              type="submit"
-              className="bg-green-200 py-[12px] px-[12px] mt-[20px]"
-            >
-              Submit
-            </button>
-          </Form>
-        )}
+        {({ errors, setFieldValue }) => {
+          console.log("errors", errors);
+          return (
+            <Form className="grid gap-y-[12px] mt-[20px]">
+              <Input label="Name" name="name" />
+              <Input label="Email" name="email" type="email" />
+              <Input label="Phone" name="phone" type="phone" />
+              <button
+                type="submit"
+                className="bg-green-200 py-[12px] px-[12px] mt-[20px]"
+              >
+                Submit
+              </button>
+            </Form>
+          );
+        }}
       </Formik>
     </CustomModal>
   );

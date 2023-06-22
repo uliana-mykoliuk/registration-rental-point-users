@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Layout from "../components/layout";
 import {
+  deleteCustomerById,
+  editCustomerById,
   getCategoriesFromFirebase,
   getProductsByCategory,
   pushDataToFirebase,
@@ -9,12 +11,13 @@ import AddUserModal from "../components/add-user-modal";
 import EditIco from "../assets/edit.svg";
 import DeleteIco from "../assets/delete.svg";
 import Image from "next/image";
+import Input from "../components/input";
 
 const UsersTable = ({
   users,
   itemsPerPage,
-  handleEditProduct,
-  handleDeleteProduct,
+  handleEditСustomer,
+  handleDeleteCustomer,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(users.length / itemsPerPage);
@@ -30,11 +33,11 @@ const UsersTable = ({
   return (
     <>
       <AddUserModal
-        product={editModal.product}
+        user={editModal.product}
         isOpen={editModal.open}
         onClose={() => setEditModal({ open: false, product: null })}
         submitFunc={async (values) => {
-          await handleEditProduct(editModal.product.id, values);
+          await handleEditСustomer(editModal.product.id, values);
           setEditModal({ open: false, product: null });
         }}
       />
@@ -65,9 +68,9 @@ const UsersTable = ({
               <td className="border border-[#aaa] p-[15px]">{user.email}</td>
               <td className="border border-[#aaa] p-[15px]">{user.phone}</td>
               <td className="border border-[#aaa] p-[15px]">
-                {user.products.map((item) => (
-                  <div>{item}</div>
-                ))}
+                {user?.products && user?.products.length > 0
+                  ? user.products.map((item) => <div>{item}</div>)
+                  : "No products in rent"}
               </td>
               <td className="border border-[#aaa] p-[15px]">
                 <div className="flex gap-[20px]">
@@ -78,7 +81,7 @@ const UsersTable = ({
                     <Image src={EditIco} alt="delete" width={16} />
                   </button>
                   <button
-                    onClick={() => handleDeleteProduct(user.id)}
+                    onClick={() => handleDeleteCustomer(user.id)}
                     className="bg-green-300 w-[32px] h-[32px] text-[24px] flex items-center justify-center leading-[24px]"
                   >
                     <Image src={DeleteIco} alt="delete" width={16} />
@@ -126,10 +129,30 @@ const UsersTable = ({
 
 const Users = () => {
   const itemsPerPage = 5;
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState(null);
+  const [searchValue, setSearchValue] = useState("");
+  const [filteredUsers, setFilteredUsers] = useState(null);
 
   const [isModalOpen, setIsModalOpen] = useState();
   const [updateData, setUpdateData] = useState(true);
+
+  useEffect(() => {
+    if (users) {
+      if (searchValue) {
+        setFilteredUsers(
+          users
+            .filter((user) =>
+              user.name.toLowerCase().includes(searchValue.toLowerCase())
+            )
+            .sort((a, b) => b?.createDate?.seconds - a?.createDate?.seconds)
+        );
+      } else {
+        setFilteredUsers(
+          users.sort((a, b) => b?.createDate?.seconds - a?.createDate?.seconds)
+        );
+      }
+    }
+  }, [searchValue, users]);
 
   const fetchData = async () => {
     const usersArray = await getCategoriesFromFirebase("custommers");
@@ -143,48 +166,58 @@ const Users = () => {
     }
   }, [updateData]);
 
-  console.log(users);
-
   const onAddUser = async (values) => {
-    const res = await pushDataToFirebase("custommers", values);
+    await pushDataToFirebase("custommers", values);
     setUpdateData(true);
     setIsModalOpen(false);
   };
 
-  // const handleEditProduct = async (id, product) => {
-  //   await editProductById(categoryId, id, product);
-  //   setUpdateData(true);
-  // };
+  const handleEditСustomer = async (id, customer) => {
+    await editCustomerById(id, customer);
+    setUpdateData(true);
+  };
 
-  // const handleDeleteProduct = async (id) => {
-  //   try {
-  //     await deleteProductById(categoryId, id);
-  //     setUpdateData(true); // Notify the parent component of the deleted product
-  //   } catch (error) {
-  //     console.error("Error deleting product:", error);
-  //   }
-  // };
+  const handleDeleteCustomer = async (id) => {
+    try {
+      await deleteCustomerById(id);
+      setUpdateData(true); // Notify the parent component of the deleted product
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
   return (
-    <Layout>
+    <Layout title="Customers">
       <AddUserModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         submitFunc={onAddUser}
       />
-      <button
-        type="button"
-        onClick={() => setIsModalOpen(true)}
-        className="bg-purple-500 py-[8px] px-[12px] self-end mb-[50px]"
-      >
-        Add User
-      </button>
-
-      <UsersTable
-        users={users}
-        itemsPerPage={itemsPerPage}
-        // handleEditProduct={handleEditProduct}
-        // handleDeleteProduct={handleDeleteProduct}
-      />
+      <div className="flex items-center justify-between mb-[50px]">
+        <input
+          name="search"
+          placeholder="Search custommer"
+          onChange={(event) => {
+            setSearchValue(event.target.value);
+          }}
+          className="border border-[#aaa] px-[16px] py-[8px]"
+        />
+        <button
+          type="button"
+          onClick={() => setIsModalOpen(true)}
+          className="bg-purple-500 py-[8px] px-[12px] self-end"
+        >
+          Add User
+        </button>
+      </div>
+      {filteredUsers && (
+        <UsersTable
+          users={filteredUsers}
+          itemsPerPage={itemsPerPage}
+          handleEditСustomer={handleEditСustomer}
+          handleDeleteCustomer={handleDeleteCustomer}
+        />
+      )}
     </Layout>
   );
 };

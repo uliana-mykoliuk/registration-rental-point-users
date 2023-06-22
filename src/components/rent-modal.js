@@ -53,6 +53,8 @@ const RentModal = ({ isOpen, onClose, submitFunc, product }) => {
           const data = {
             ...values,
             userName: users.filter((user) => user.id === values.userId)[0].name,
+            income: 0,
+            expectedIncome: values.price * values.daysAmount,
           };
           console.log("val", data);
           submitFunc(data);

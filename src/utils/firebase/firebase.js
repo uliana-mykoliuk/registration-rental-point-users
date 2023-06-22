@@ -21,6 +21,7 @@ import {
   addDoc,
   deleteDoc,
   updateDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -97,7 +98,9 @@ export const pushDataToFirebase = async (collectionName, data) => {
     const collectionRef = collection(db, collectionName);
     const docRef = doc(collectionRef);
 
-    await setDoc(docRef, data);
+    const dataWithCreateDate = { ...data, createDate: serverTimestamp() };
+
+    await setDoc(docRef, dataWithCreateDate);
 
     console.log("Data pushed to Firebase successfully!");
   } catch (error) {
@@ -247,6 +250,39 @@ export const deleteOrderById = async (orderId) => {
   }
 };
 
+export const editCustomerById = async (customerId, updatedData) => {
+  try {
+    const customerRef = doc(db, "custommers", customerId);
+    await updateDoc(customerRef, updatedData);
+
+    console.log("Customer updated successfully!");
+  } catch (error) {
+    console.error("Error editing customer:", error);
+  }
+};
+
+export const deleteCustomerById = async (customerId) => {
+  try {
+    const customerRef = doc(db, "custommers", customerId);
+    await deleteDoc(customerRef);
+
+    console.log("Customer deleted successfully!");
+  } catch (error) {
+    console.error("Error deleting customer:", error);
+  }
+};
+
+export const editCategoryById = async (categoryId, updatedData) => {
+  try {
+    const categoryRef = doc(db, "categories", categoryId);
+
+    await updateDoc(categoryRef, updatedData);
+
+    console.log("Category updated successfully!");
+  } catch (error) {
+    console.error("Error editing category:", error);
+  }
+};
 
 export const createUserDocumentFromAuth = async (
   userAuth,
@@ -277,7 +313,49 @@ export const createUserDocumentFromAuth = async (
   return userDocRef;
 };
 
+export const calculateTotalIncome = async () => {
+  try {
+    const ordersCollectionRef = collection(db, "orders");
+    const querySnapshot = await getDocs(ordersCollectionRef);
 
+    let totalIncome = 0;
+
+    querySnapshot.forEach((doc) => {
+      const orderData = doc.data();
+      const orderIncome = orderData.income;
+
+      // Add the order income to the total
+      totalIncome += orderIncome;
+    });
+
+    return totalIncome;
+  } catch (error) {
+    console.error("Error calculating total income:", error);
+    return 0;
+  }
+};
+
+export const calculateTotalExpectedIncome = async () => {
+  try {
+    const ordersCollectionRef = collection(db, "orders");
+    const querySnapshot = await getDocs(ordersCollectionRef);
+
+    let totalIncome = 0;
+
+    querySnapshot.forEach((doc) => {
+      const orderData = doc.data();
+      const orderIncome = orderData.expectedIncome;
+
+      // Add the order income to the total
+      totalIncome += orderIncome;
+    });
+
+    return totalIncome;
+  } catch (error) {
+    console.error("Error calculating total income:", error);
+    return 0;
+  }
+};
 
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
   if (!email || !password) return;

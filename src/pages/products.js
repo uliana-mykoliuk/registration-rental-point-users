@@ -5,6 +5,7 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import ProductCard from "../components/product-card";
 import {
   createCategory,
+  editCategoryById,
   getCategoriesAndDocuments,
   getCategoriesFromFirebase,
   pushDataToFirebase,
@@ -14,6 +15,7 @@ import Layout from "../components/layout";
 
 const RentalPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editModal, setEditModal] = useState({ open: false, product: null });
   const [products, setProducts] = useState([]);
   const [updateData, setUpdateData] = useState(true);
 
@@ -34,10 +36,23 @@ const RentalPage = () => {
     setUpdateData(true);
     setIsModalOpen(false);
   };
-  
+
+  const handleEditCategory = async (id, values) => {
+    await editCategoryById(id, values);
+    setUpdateData(true)
+  };
 
   return (
-    <Layout>
+    <Layout title="Categories">
+      <AddCategoryModal
+        category={editModal.product}
+        isOpen={editModal.open}
+        onClose={() => setEditModal({ open: false, product: null })}
+        submitFunc={async (values) => {
+          await handleEditCategory(editModal.product.id, values);
+          setEditModal({ open: false, product: null });
+        }}
+      />
       <AddCategoryModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -58,6 +73,9 @@ const RentalPage = () => {
               id={shopItem.id}
               title={shopItem.title}
               image={shopItem.image}
+              handleEditCategory={() =>
+                setEditModal({ open: true, product: shopItem })
+              }
             />
           );
         })}

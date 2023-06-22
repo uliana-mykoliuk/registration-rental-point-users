@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import Layout from "../components/layout";
 import {
+  calculateTotalExpectedIncome,
+  calculateTotalIncome,
   deleteOrderById,
   editOrderById,
   editProducRentStatustById,
   getCategoriesFromFirebase,
-  getProductsByCategory,
-  pushDataToFirebase,
   removeProductFromUserCollection,
 } from "../utils/firebase/firebase";
-import AddUserModal from "../components/add-user-modal";
 import StopIco from "../assets/disable.svg";
 import DeleteIco from "../assets/delete.svg";
 import Image from "next/image";
@@ -26,7 +25,6 @@ const OrdersTable = ({
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = orders.slice(indexOfFirstItem, indexOfLastItem);
-  const [editModal, setEditModal] = useState({ open: false, id: null });
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -101,10 +99,10 @@ const OrdersTable = ({
               <td className="border border-[#aaa] p-[15px]">{order?.status}</td>
               <td className="border border-[#aaa] p-[15px]">{order?.price}</td>
               <td className="border border-[#aaa] p-[15px]">
-                {order?.price * order?.daysAmount}
+                {order?.expectedIncome}
               </td>
               <td className="border border-[#aaa] p-[15px]">
-                {order?.price * order?.currentDaysAmount}
+                {order?.income || 0}
               </td>
               <td className="border border-[#aaa] p-[15px]">
                 <div className="flex gap-[20px]">
@@ -115,7 +113,7 @@ const OrdersTable = ({
                     <Image src={StopIco} alt="delete" width={16} />
                   </button>
                   <button
-                    onClick={() => handleDeleteOrder(order.id)}
+                    onClick={() => handleDeleteOrder(order)}
                     className="bg-green-300 w-[32px] h-[32px] text-[24px] flex items-center justify-center leading-[24px]"
                   >
                     <Image src={DeleteIco} alt="delete" width={16} />
@@ -164,12 +162,36 @@ const OrdersTable = ({
 const Orders = () => {
   const itemsPerPage = 5;
   const [orders, setOrders] = useState([]);
-
-  const [isModalOpen, setIsModalOpen] = useState();
   const [updateData, setUpdateData] = useState(true);
+  const [searchValue, setSearchValue] = useState("");
+  const [filteredOrders, setFilteredOrders] = useState(null);
+  const [income, setTotalIncome] = useState(0);
+  const [expectedIncome, setTotalExpectedIncome] = useState(0);
+
+  useEffect(() => {
+    if (orders) {
+      if (searchValue) {
+        setFilteredOrders(
+          orders
+            .filter((orders) =>
+              orders.userName.toLowerCase().includes(searchValue.toLowerCase())
+            )
+            .sort((a, b) => b?.createDate?.seconds - a?.createDate?.seconds)
+        );
+      } else {
+        setFilteredOrders(
+          orders.sort((a, b) => b?.createDate?.seconds - a?.createDate?.seconds)
+        );
+      }
+    }
+  }, [searchValue, orders]);
 
   const fetchData = async () => {
     const ordersArr = await getCategoriesFromFirebase("orders");
+    const totalIncome = await calculateTotalIncome();
+    const totaExpectedIncome = await calculateTotalExpectedIncome();
+    setTotalIncome(totalIncome);
+    setTotalExpectedIncome(totaExpectedIncome);
     setOrders(ordersArr);
     setUpdateData(false);
   };
@@ -189,6 +211,10 @@ const Orders = () => {
       currentDaysAmount:
         moment().diff(moment(order.startDay, "DD-MM-YYYY hh:mm:ss"), "days") +
         1,
+      income:
+        (moment().diff(moment(order.startDay, "DD-MM-YYYY hh:mm:ss"), "days") +
+          1) *
+        order.price,
       status: "CLOSED",
     };
     await editProducRentStatustById(order.categoryId, order.productId, false);
@@ -208,13 +234,35 @@ const Orders = () => {
     }
   };
   return (
-    <Layout>
-      <OrdersTable
-        orders={orders}
-        itemsPerPage={itemsPerPage}
-        handleStopOrder={handleStopOrder}
-        handleDeleteOrder={handleDeleteOrder}
-      />
+    <Layout title={"Orders"}>
+      <div className="grid grid-cols-2 gap-[30px] mb-[30px]">
+        <div className="bg-white shadow-xl grid items-center justify-items-center py-[30px] border-[5px] border-purple-300 text-[28px]">
+          Expected Income {expectedIncome}
+        </div>
+        <div className="bg-white shadow-xl grid items-center justify-items-center py-[30px] border-[5px] border-purple-300 text-[28px]">
+          Total Income {income}
+        </div>
+      </div>
+      <div className="flex items-center justify-between mb-[50px]">
+        <input
+          name="search"
+          placeholder="Search orders by username"
+          onChange={(event) => {
+            setSearchValue(event.target.value);
+          }}
+          className="border border-[#aaa] px-[16px] py-[8px]"
+        />
+      </div>
+      {filteredOrders && filteredOrders.length > 0 ? (
+        <OrdersTable
+          orders={orders}
+          itemsPerPage={itemsPerPage}
+          handleStopOrder={handleStopOrder}
+          handleDeleteOrder={handleDeleteOrder}
+        />
+      ) : (
+        <h2 className="text-center text-[24px]">No orders found...</h2>
+      )}
     </Layout>
   );
 };

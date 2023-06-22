@@ -29,7 +29,7 @@ const AddProductModal = ({ isOpen, onClose, submitFunc, product }) => {
           price: product?.price ? product?.price : "",
           description: product?.description ? product?.description : "",
           image: product?.image ? product?.image : "",
-          rented: product?.rented,
+          rented: product?.rented ? product?.rented : false,
         }}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {
