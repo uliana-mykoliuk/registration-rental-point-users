@@ -3,6 +3,7 @@ import { Fragment, useContext } from "react";
 import { UserContext } from "../contexts/user-context";
 
 import { signOutUser } from "../utils/firebase/firebase";
+
 import Link from "next/link";
 
 const Navigation = () => {

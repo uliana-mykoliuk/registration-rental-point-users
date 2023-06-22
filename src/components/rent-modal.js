@@ -32,7 +32,7 @@ const RentModal = ({ isOpen, onClose, submitFunc, product }) => {
 
   return (
     <CustomModal
-      title={product ? "Edit Product" : "Add Product"}
+      title={"Rent Product"}
       isOpen={isOpen}
       onClose={onClose}
     >

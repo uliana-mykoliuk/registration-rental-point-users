@@ -107,8 +107,9 @@ const OrdersTable = ({
               <td className="border border-[#aaa] p-[15px]">
                 <div className="flex gap-[20px]">
                   <button
+                    disabled={order?.status === "CLOSED"}
                     onClick={() => handleStopOrder(order)}
-                    className="bg-green-300 w-[32px] h-[32px] text-[24px] flex items-center justify-center leading-[24px]"
+                    className="bg-green-300 w-[32px] h-[32px] text-[24px] flex items-center justify-center leading-[24px] disabled:bg-[#aaa]"
                   >
                     <Image src={StopIco} alt="delete" width={16} />
                   </button>
